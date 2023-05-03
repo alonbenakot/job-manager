@@ -22,14 +22,15 @@ public class JobApplication {
     private Boolean continuingProcess;
     private String userId;
 
-    public void addInterView(Interview interview) {
+    public JobApplication addInterView(Interview interview) {
         if (interviews.isEmpty()) {
             interviews = new ArrayList<>();
         }
-        interview.setInterviewNumber(interviews.size()+1);
+        interview.setInterviewNumber(this.interviews.size()+1);
         interview.setJobApplicationId(this.id);
-        interviews.add(interview);
-        continuingProcess = Boolean.TRUE;
+        this.interviews.add(interview);
+        this.continuingProcess = Boolean.TRUE;
+        return this;
     }
 
     @Override

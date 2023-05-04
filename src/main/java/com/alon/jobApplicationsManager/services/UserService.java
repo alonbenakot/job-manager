@@ -4,9 +4,11 @@ import com.alon.jobApplicationsManager.exceptions.JobAppException;
 import com.alon.jobApplicationsManager.beans.User;
 import com.alon.jobApplicationsManager.messages.ErrorMessages;
 import com.alon.jobApplicationsManager.repositories.UserRepository;
+import com.alon.jobApplicationsManager.responses.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -15,28 +17,36 @@ public class UserService {
 
     private final UserRepository repository;
 
-    public void addUser(User user) throws Exception {
+    public UserResponse addUser(User user) throws JobAppException {
         if (isUserExists(user)) {
-            throw new Exception(ErrorMessages.USER_EXISTS);
+            throw new JobAppException(ErrorMessages.USER_EXISTS);
         }
-        repository.save(user);
+        return new UserResponse(repository.save(user));
     }
 
     private boolean isUserExists(User user) {
         return repository.existsByEmail(user.getEmail()) || !user.getId().isBlank();
     }
 
-    public User getUser(String userId) throws JobAppException {
+    private User getUser(String userId) throws JobAppException {
         Optional<User> userOptional = repository.findById(userId);
         return userOptional.orElseThrow(() -> new JobAppException(ErrorMessages.USER_NOT_FOUND));
     }
 
-    public void deleteUser(String userId) {
-        repository.deleteById(userId);
+    public UserResponse getOneUser(String userId) throws JobAppException {
+        return new UserResponse(getUser(userId));
     }
 
-    public User updateUser(User userToUpdate) throws JobAppException {
+    public void deleteUser(String userId) throws JobAppException {
+        long deleteCount = repository.removeById(userId);
+        if (deleteCount < 1) {
+            throw new JobAppException(ErrorMessages.USER_NOT_FOUND);
+        }
+    }
+
+    public UserResponse updateUser(User userToUpdate) throws JobAppException {
         User user = getUser(userToUpdate.getId());
+
         if (userToUpdate.getFirstName() != null && !userToUpdate.getFirstName().equals(user.getFirstName())) {
             user.setFirstName(userToUpdate.getFirstName());
         }
@@ -49,6 +59,11 @@ public class UserService {
         if (userToUpdate.getPassword() != null && !userToUpdate.getPassword().equals(user.getPassword())) {
             user.setPassword(userToUpdate.getPassword());
         }
-        return user;
+
+        return new UserResponse(user);
+    }
+
+    public List<User> getAllUsers() {
+        return repository.findAll();
     }
 }

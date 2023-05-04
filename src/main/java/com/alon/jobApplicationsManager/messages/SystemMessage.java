@@ -3,16 +3,16 @@ package com.alon.jobApplicationsManager.messages;
 import lombok.Data;
 
 @Data
-public class Message {
+public class SystemMessage {
     private String messageText;
     private boolean messageExists;
 
-    public Message() {
+    public SystemMessage() {
         this.messageText = null;
         this.messageExists = false;
     }
 
-    public Message(String messageText) {
+    public SystemMessage(String messageText) {
         this.messageText = messageText;
         this.messageExists = true;
     }

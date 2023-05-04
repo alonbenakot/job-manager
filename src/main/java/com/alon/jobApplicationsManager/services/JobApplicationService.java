@@ -1,12 +1,11 @@
 package com.alon.jobApplicationsManager.services;
 
-import com.alon.jobApplicationsManager.JobAppException;
-import com.alon.jobApplicationsManager.beans.ApplicationResponse;
+import com.alon.jobApplicationsManager.exceptions.JobAppException;
 import com.alon.jobApplicationsManager.beans.Interview;
 import com.alon.jobApplicationsManager.beans.JobApplication;
 import com.alon.jobApplicationsManager.messages.ErrorMessages;
-import com.alon.jobApplicationsManager.messages.Message;
 import com.alon.jobApplicationsManager.repositories.JobApplicationRepository;
+import com.alon.jobApplicationsManager.responses.JobApplicationResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +19,7 @@ public class JobApplicationService {
 
     private final JobApplicationRepository repository;
 
-    public ApplicationResponse addInterview(Interview interviewToAdd, String userId) throws JobAppException {
+    public JobApplicationResponse addInterview(Interview interviewToAdd, String userId) throws JobAppException {
         ArrayList<Interview> userInterviews = getUserInterviews(userId);
 
         boolean sameDayInterview = userInterviews.stream().anyMatch(
@@ -30,7 +29,7 @@ public class JobApplicationService {
 
         Optional<JobApplication> jobApplicationOptional = repository.findById(interviewToAdd.getJobApplicationId());
 
-        ApplicationResponse response = new ApplicationResponse(jobApplicationOptional.orElseThrow(
+        JobApplicationResponse response = new JobApplicationResponse(jobApplicationOptional.orElseThrow(
                 () -> new JobAppException(ErrorMessages.JOB_APP_NOT_FOUND)).addInterView(interviewToAdd));
 
         System.out.println("Interview " + interviewToAdd + " successfully added");
@@ -38,7 +37,7 @@ public class JobApplicationService {
         return response;
     }
 
-    public ApplicationResponse addJobApplication(JobApplication jobApplication) throws JobAppException {
+    public JobApplicationResponse addJobApplication(JobApplication jobApplication) throws JobAppException {
         List<JobApplication> userApplications = getUserApplications(jobApplication.getUserId());
 
         boolean isApplicationExists = isApplicationExists(userApplications, jobApplication);
@@ -49,7 +48,7 @@ public class JobApplicationService {
 
         System.out.println("Application " + jobApplication + " successfully added.");
 
-        return new ApplicationResponse(jobApplication);
+        return new JobApplicationResponse(jobApplication);
     }
 
     private boolean isApplicationExists(List<JobApplication> userApplications, JobApplication jobApplication) {

@@ -1,4 +1,4 @@
-package com.alon.jobApplicationsManager;
+package com.alon.jobApplicationsManager.exceptions;
 
 public class JobAppException extends Exception{
 

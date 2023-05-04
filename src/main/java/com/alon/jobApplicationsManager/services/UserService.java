@@ -1,6 +1,6 @@
 package com.alon.jobApplicationsManager.services;
 
-import com.alon.jobApplicationsManager.JobAppException;
+import com.alon.jobApplicationsManager.exceptions.JobAppException;
 import com.alon.jobApplicationsManager.beans.User;
 import com.alon.jobApplicationsManager.messages.ErrorMessages;
 import com.alon.jobApplicationsManager.repositories.UserRepository;
@@ -16,10 +16,14 @@ public class UserService {
     private final UserRepository repository;
 
     public void addUser(User user) throws Exception {
-        if (repository.existsById(user.getId())) {
+        if (isUserExists(user)) {
             throw new Exception(ErrorMessages.USER_EXISTS);
         }
         repository.save(user);
+    }
+
+    private boolean isUserExists(User user) {
+        return repository.existsByEmail(user.getEmail()) || !user.getId().isBlank();
     }
 
     public User getUser(String userId) throws JobAppException {
